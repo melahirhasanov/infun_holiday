@@ -3,8 +3,8 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name:     { type: String, required: true },
-  email:    { type: String, sparse: true, default: null },
-  phone:    { type: String, sparse: true, default: null },
+  email:    { type: String, default: null },
+  phone:    { type: String, default: null },
   password: { type: String, required: true },
   role: {
     type: String,
@@ -19,11 +19,6 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String, default: null }
 }, { timestamps: true });
 
-// Köhnə username index-ini avtomatik sil (migration)
-userSchema.on('index', function (err) {
-  if (err) console.error('User index error:', err);
-});
-
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
@@ -36,9 +31,14 @@ userSchema.methods.comparePassword = async function (candidate) {
 
 const User = mongoose.model('User', userSchema);
 
-// Köhnə username_1 indexini sil
-User.collection.dropIndex('username_1').catch(() => {
-  // index artıq yoxdursa ignore et
+// DB bağlantısı hazır olandan sonra köhnə username_1 indexini sil
+mongoose.connection.once('open', async () => {
+  try {
+    await User.collection.dropIndex('username_1');
+    console.log('[migration] username_1 index silindi');
+  } catch {
+    // index yoxdursa problem deyil
+  }
 });
 
 module.exports = User;
