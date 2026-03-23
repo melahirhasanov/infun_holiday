@@ -31,14 +31,16 @@ userSchema.methods.comparePassword = async function (candidate) {
 
 const User = mongoose.model('User', userSchema);
 
-// DB bağlantısı hazır olandan sonra köhnə username_1 indexini sil
 mongoose.connection.once('open', async () => {
   try {
     await User.collection.dropIndex('username_1');
     console.log('[migration] username_1 index silindi');
-  } catch {
-    // index yoxdursa problem deyil
-  }
+  } catch { /* yoxdursa ignore et */ }
+
+  try {
+    await User.collection.dropIndex('email_1');
+    console.log('[migration] email_1 index silindi');
+  } catch { /* yoxdursa ignore et */ }
 });
 
 module.exports = User;
