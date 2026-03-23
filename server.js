@@ -10,7 +10,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'],
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://infaq-ramadan.netlify.app', // öz Netlify URL-ini yaz
+  ],
   credentials: true
 }));
 app.use(express.json());
@@ -25,7 +29,6 @@ app.use('/api/categories', require('./routes/categoriesRoute'));
 mongoose.connect(process.env.DB_URL)
   .then(() => {
     console.log('✅ MongoDB connected');
-    // Seed role codes and categories
     require('./utils/seeder')();
   })
   .catch(err => console.error('❌ MongoDB error:', err));
