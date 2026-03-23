@@ -13,7 +13,7 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
-    'https://infaq-ramadan.netlify.app', // öz Netlify URL-ini yaz
+    'https://infun-ramadan.netlify.app', // öz Netlify URL-ini yaz
   ],
   credentials: true
 }));
